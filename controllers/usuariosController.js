@@ -73,7 +73,7 @@ exports.loginUsuario = async (req, res) => {
         await usuario.save();
 
         const { contraseña: _, ...usuarioSinContraseña } = usuario.toJSON();
-        res.json({ token, usuario: usuarioSinContraseña });
+        res.json({  usuario: usuarioSinContraseña });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

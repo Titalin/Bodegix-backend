@@ -14,7 +14,7 @@ module.exports = (req, res, next) => {
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.usuario = decoded; // inyecta { id, rol_id } en req.usuario
+        req.usuario = decoded; 
         next();
     } catch (error) {
         res.status(401).json({ error: 'Token inválido o expirado' });
