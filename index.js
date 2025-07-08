@@ -32,11 +32,11 @@ const PORT = process.env.PORT || 5000;
 
 sequelize.sync({ alter: false })
     .then(() => {
-        console.log('🟢 Base de datos conectada y sincronizada');
+        console.log(' Base de datos conectada y sincronizada');
         app.listen(PORT, () => {
-            console.log(`🚀 Bodegix backend corriendo en el puerto ${PORT}`);
+            console.log(` Bodegix backend corriendo en el puerto ${PORT}`);
         });
     })
     .catch((error) => {
-        console.error('🔴 Error al conectar con la base de datos:', error);
+        console.error(' Error al conectar con la base de datos:', error);
     });

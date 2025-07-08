@@ -18,3 +18,44 @@ exports.createLocker = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+exports.updateLocker = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { identificador, ubicacion, estado, tipo, empresa_id } = req.body;
+
+        const locker = await Locker.findByPk(id);
+        if (!locker) {
+            return res.status(404).json({ error: 'Locker no encontrado' });
+        }
+
+        locker.identificador = identificador ?? locker.identificador;
+        locker.ubicacion = ubicacion ?? locker.ubicacion;
+        locker.estado = estado ?? locker.estado;
+        locker.tipo = tipo ?? locker.tipo;
+        locker.empresa_id = empresa_id ?? locker.empresa_id;
+
+        await locker.save();
+
+        res.json(locker);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.deleteLocker = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const locker = await Locker.findByPk(id);
+        if (!locker) {
+            return res.status(404).json({ error: 'Locker no encontrado' });
+        }
+
+        await locker.destroy();
+
+        res.json({ message: 'Locker eliminado correctamente' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};

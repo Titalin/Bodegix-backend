@@ -1,8 +1,25 @@
+// routes/usuariosRoutes.js
 const express = require('express');
 const router = express.Router();
 const usuariosController = require('../controllers/usuariosController');
+const auth = require('../middlewares/authMiddleware'); // ✅ Importado correctamente
 
-router.get('/', usuariosController.getUsuarios);
-router.post('/', usuariosController.createUsuario);
+// Listar usuarios
+router.get('/', auth, usuariosController.getUsuarios);
+
+// Crear usuario
+router.post('/', auth, usuariosController.createUsuario);
+
+// Login (sin auth)
 router.post('/login', usuariosController.loginUsuario);
+
+// Logout
+router.post('/logout', auth, usuariosController.logoutUsuario);
+
+// Actualizar usuario
+router.put('/:id', auth, usuariosController.updateUsuario);
+
+// Eliminar usuario
+router.delete('/:id', auth, usuariosController.deleteUsuario);
+
 module.exports = router;
