@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const usuariosController = require('../controllers/usuariosController');
-const auth = require('../middlewares/authMiddleware'); // ✅ Importado correctamente
+const auth = require('../middlewares/authMiddleware'); 
 
 // Listar usuarios
 router.get('/', auth, usuariosController.getUsuarios);
@@ -21,5 +21,8 @@ router.put('/:id', auth, usuariosController.updateUsuario);
 
 // Eliminar usuario
 router.delete('/:id', auth, usuariosController.deleteUsuario);
+
+// Obtener usuario por ID (nueva ruta)
+router.get('/:id', auth, usuariosController.getUsuarioById);
 
 module.exports = router;

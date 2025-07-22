@@ -1,4 +1,6 @@
 const Usuario = require('../models/Usuario');
+const Empresa = require('../models/Empresa'); // ✅ necesario
+const Rol = require('../models/Rol');   
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -12,6 +14,29 @@ exports.getUsuarios = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
+};
+
+exports.getUsuarios = async (req, res) => {
+  try {
+    const empresa_id = req.usuario?.empresa_id;
+
+    if (!empresa_id) {
+      return res.status(400).json({ error: 'empresa_id no proporcionado en el token' });
+    }
+
+    const usuarios = await Usuario.findAll({
+      where: { empresa_id },
+      attributes: { exclude: ['contraseña'] },
+      include: [
+        { model: Empresa, as: 'empresa' },
+        { model: Rol, as: 'rol' }
+      ]
+    });
+
+    res.json(usuarios);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 exports.createUsuario = async (req, res) => {
@@ -62,23 +87,22 @@ exports.loginUsuario = async (req, res) => {
             return res.status(401).json({ error: 'Contraseña incorrecta' });
         }
 
+        // Añadido empresa_id al token
         const token = jwt.sign(
-            { id: usuario.id, rol_id: usuario.rol_id },
+            { id: usuario.id, rol_id: usuario.rol_id, empresa_id: usuario.empresa_id },
             process.env.JWT_SECRET,
             { expiresIn: '1d' }
         );
 
-        // ✅ Almacena el token en la base de datos
         usuario.token = token;
         await usuario.save();
 
         const { contraseña: _, ...usuarioSinContraseña } = usuario.toJSON();
-        res.json({  usuario: usuarioSinContraseña });
+        res.json({ usuario: usuarioSinContraseña, token });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
-
 
 exports.updateUsuario = async (req, res) => {
     try {
@@ -137,6 +161,24 @@ exports.deleteUsuario = async (req, res) => {
 
         await usuario.destroy();
         res.json({ message: 'Usuario eliminado correctamente' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.getUsuarioById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const usuario = await Usuario.findByPk(id, {
+            attributes: { exclude: ['contraseña'] },
+            include: ['rol', 'empresa']
+        });
+
+        if (!usuario) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        res.json(usuario);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

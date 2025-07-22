@@ -9,6 +9,24 @@ exports.getLockers = async (req, res) => {
     }
 };
 
+exports.getLockers = async (req, res) => {
+    try {
+        const { empresa_id } = req.query;
+        const whereClause = empresa_id ? { empresa_id } : {};
+
+        const lockers = await Locker.findAll({
+            where: whereClause,
+            include: ['empresa']
+        });
+
+        res.json(lockers);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+
 exports.createLocker = async (req, res) => {
     try {
         const { identificador, ubicacion, estado, tipo, empresa_id } = req.body;
@@ -22,7 +40,7 @@ exports.createLocker = async (req, res) => {
 exports.updateLocker = async (req, res) => {
     try {
         const { id } = req.params;
-        const { identificador, ubicacion, estado, tipo, empresa_id } = req.body;
+        const { identificador, ubicacion, estado, tipo, empresa_id, usuario_id } = req.body;
 
         const locker = await Locker.findByPk(id);
         if (!locker) {
@@ -34,6 +52,7 @@ exports.updateLocker = async (req, res) => {
         locker.estado = estado ?? locker.estado;
         locker.tipo = tipo ?? locker.tipo;
         locker.empresa_id = empresa_id ?? locker.empresa_id;
+        locker.usuario_id = usuario_id ?? locker.usuario_id;
 
         await locker.save();
 
